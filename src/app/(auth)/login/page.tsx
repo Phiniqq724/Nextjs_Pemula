@@ -1,12 +1,11 @@
 "use client";
 import React from "react";
-import { BASE_API_URL } from "@/lib/global";
-import { storeCookie } from "@/lib/client-cookie";
-import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { loginAction } from "@/app/action/user";
+// import Alert from "@/components/Alert";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
@@ -14,44 +13,57 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const router = useRouter();
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: FormEvent) => {
-    try {
-      e.preventDefault();
-      const url = `${BASE_API_URL}/user/login`;
-      const payload = JSON.stringify({ email: email, password });
-      const { data } = await axios.post(url, payload, {
-        headers: { "Content-Type": "application/json" },
-      });
-      if (data.status == true) {
-        toast(data.message, {
-          hideProgressBar: true,
-          containerId: `toastLogin`,
-          type: "success",
-          autoClose: 2000,
-        });
-        storeCookie("token", data.data.token);
-        storeCookie("id", data.data.idUser);
-        storeCookie("name", data.data.name);
-        storeCookie("role", data.data.role);
-        const role = data.data.role;
-        if (role === `MANAGER`)
-          setTimeout(() => router.replace(`/manager/dashboard`), 1000);
-        else if (role === `CASHIER`)
-          setTimeout(() => router.replace(`/cashier/dashboard`), 1000);
-      } else
-        toast(data.message, {
-          hideProgressBar: true,
-          containerId: `toastLogin`,
-          type: "warning",
-        });
-    } catch (error) {
-      console.log(error);
-      toast(`Something wrong ${error}`, {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      const errorMsg = "Email and password are required";
+      setError(errorMsg);
+      toast(errorMsg, {
         hideProgressBar: true,
         containerId: `toastLogin`,
         type: "error",
       });
+      return;
+    }
+
+    const credentials = {
+      email: email.trim(),
+      password: password.trim(),
+    };
+
+    try {
+      const response = await loginAction(credentials);
+      if (response.status && response.logged) {
+        document.cookie = `token=${response.data.token}; path=/;`;
+        document.cookie = `id=${JSON.stringify(response.data.idUser)}; path=/;`;
+        document.cookie = `name=${response.data.name}; path=/;`;
+        router.push("/");
+        toast(response.message, {
+          hideProgressBar: true,
+          containerId: `toastLogin`,
+          type: "success",
+        });
+      } else {
+        setError(response.message);
+        toast(`Error : ${response.message}`, {
+          hideProgressBar: true,
+          containerId: `toastLogin`,
+          type: "error",
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+        toast(err.message, {
+          hideProgressBar: true,
+          containerId: `toastLogin`,
+          type: "error",
+        });
+      }
     }
   };
 

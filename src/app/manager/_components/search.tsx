@@ -25,6 +25,7 @@ export const Search = ({ url, search }: Props) => {
       onChange={(e) => setSearchValue(e.target.value)}
       onKeyDown={handleSearch}
       placeholder="Search..."
+      className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 max-w-md focus:ring-primary focus:border-transparent"
     />
   );
 };

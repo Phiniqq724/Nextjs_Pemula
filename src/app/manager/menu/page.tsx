@@ -7,19 +7,21 @@ import { Search } from "../_components/search";
 import Alert from "@/components/Alert";
 // import { getCookies } from "@/lib/server-cookies";
 import { cookies } from "next/headers";
+import AddMenu from "./_components/addMenu";
+import EditMenu from "./_components/editMenu";
+import DeleteMenu from "./_components/deleteMenu";
 
 const getMenu = async (search: string): Promise<iMenu[]> => {
+  let result: iMenu[] = [];
   try {
     const TOKEN = (await cookies()).get("token")?.value || "";
     const url = `${BASE_API_URL}/menu?search=${search}`;
     const { data } = await get(url, TOKEN);
-    let result: iMenu[] = [];
     if (data?.status) result = [...data.data];
-    return result;
   } catch (error) {
     console.log(error);
-    return [];
   }
+  return result;
 };
 
 const MenuPage = async ({
@@ -52,60 +54,92 @@ const MenuPage = async ({
   };
 
   return (
-    <div>
-      <div className="m-2 bg-white rounded-lg p-3 border-t-4 border-t-primary shadow-md">
-        <h4 className="text-xl font-bold mb-2">Menu Data</h4>
-        <p className="text-sm text-secondary mb-4">
+    <>
+      <div className="mt-5">
+        <h4 className="text-xl font-bold mb-2 text-center">Menu Data</h4>
+        <p className="text-sm text-secondary mb-4 text-center">
           This page displays menu data, allowing menus to view details, search,
           and manage menu items by adding, editing, or deleting them.
         </p>
         <div className="flex justify-between items-center mb-4">
           {/* Search Bar */}
-          <div className="flex items-center w-full max-w-md flex-grow">
+          <div className="flex justify-center items-center w-full gap-4">
             <Search url={`/manager/menu`} search={search} />
+            <AddMenu />
           </div>
         </div>
-        {
-    menu.length == 0 ?
-        <Alert title="Informasi" variants="info">
+        {menu.length == 0 ? (
+          <Alert title="Informasi" variants="info">
             No data Available
-        </Alert>
-    :
-    <>
-        <div className="m-2">
-            {menu.map((data, index) => (
-                <div key={`keyPrestasi${index}`} className={`flex flex-wrap shadow m-2`}>
-                    <div className="w-full md:w-1/12 p-2">
-                        <small className="text-sm font-bold text-primary">Picture</small><br />
-                        <Image width={40} height={40} src={`${BASE_IMAGE_MENU}/${data.image}`} className="rounded-sm overflow-hidden" alt="preview" unoptimized />
+          </Alert>
+        ) : (
+          <>
+            <div className="m-2">
+              {menu.map((data, index) => (
+                <div
+                  key={`key-${index}`}
+                  className={`flex flex-wrap m-2 border border-gray-200 rounded-md`}
+                >
+                  <div className="w-full md:w-1/12 p-2">
+                    <small className="text-sm font-bold text-primary">
+                      Picture
+                    </small>
+                    <br />
+                    <Image
+                      width={40}
+                      height={40}
+                      src={`${BASE_IMAGE_MENU}/${data.image}`}
+                      className="rounded-sm overflow-hidden"
+                      alt="preview"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="w-full md:w-2/12 p-2">
+                    <small className="text-sm font-bold text-primary">
+                      Name
+                    </small>{" "}
+                    <br />
+                    {data.name}
+                  </div>
+                  <div className="w-full md:w-1/12 p-2">
+                    <small className="text-sm font-bold text-primary">
+                      Price
+                    </small>{" "}
+                    <br />
+                    {data.price}
+                  </div>
+                  <div className="w-full md:w-5/12 p-2">
+                    <small className="text-sm font-bold text-primary">
+                      Description
+                    </small>{" "}
+                    <br />
+                    {data.description}
+                  </div>
+                  <div className="w-full md:w-1/12 p-2">
+                    <small className="text-sm font-bold text-primary">
+                      Category
+                    </small>{" "}
+                    <br />
+                    {category(data.category)}
+                  </div>
+                  <div className="w-full md:w-2/12 p-2">
+                    <small className="text-sm font-bold text-primary">
+                      Action
+                    </small>
+                    <div className="flex gap-1">
+                      <EditMenu selectedMenu={data} />
+                      <DeleteMenu selectedMenu={data} />
                     </div>
-                    <div className="w-full md:w-2/12 p-2">
-                        <small className="text-sm font-bold text-primary">Name</small> <br />
-                            {data.name}
-                    </div>
-                    <div className="w-full md:w-1/12 p-2">
-                        <small className="text-sm font-bold text-primary">Price</small> <br />
-                            {data.price}
-                    </div>
-                    <div className="w-full md:w-5/12 p-2">
-                        <small className="text-sm font-bold text-primary">Description</small> <br />
-                            {data.description}
-                    </div>
-                    <div className="w-full md:w-1/12 p-2">
-                        <small className="text-sm font-bold text-primary">Category</small> <br />
-                        {category(data.category)}
-                    </div>
-                    <div className="w-full md:w-2/12 p-2">
-                        <small className="text-sm font-bold text-primary">Action</small><br />
-                    </div>
-            </div>
-            ))}
-        </div>
-    </>
-}
 
+                    <br />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 export default MenuPage;
