@@ -2,7 +2,7 @@
 
 import { KeyboardEvent, ReactNode } from "react";
 interface Props {
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   type: "text" | "number" | "color" | "email" | "password" | "date";
   className?: string;

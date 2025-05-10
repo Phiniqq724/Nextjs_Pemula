@@ -4,11 +4,12 @@ import { iUser } from "@/lib/types";
 // import { get } from "http";
 import { cookies } from "next/headers";
 import React from "react";
+import Button from "./Buttons";
 
-interface SidebarContentsProps {
-  name: string;
-  link: string;
-}
+// interface SidebarContentsProps {
+//   name: string;
+//   link: string;
+// }
 
 const getUser = async (id: number): Promise<iUser[]> => {
   let result: iUser[] = [];
@@ -30,10 +31,20 @@ const getUser = async (id: number): Promise<iUser[]> => {
 
 export default function SidebarContents() {
   const idUser = getCookie("id") || "";
+  // const userName = getCookie("name") || "";
 
   const getUserData = getUser(parseInt(idUser));
 
   console.log(getUserData);
 
-  return <></>;
+  return (
+    <Button
+      variants="danger"
+      onClick={() => {
+        console.log(getUserData);
+      }}
+    >
+      Nigga
+    </Button>
+  );
 }

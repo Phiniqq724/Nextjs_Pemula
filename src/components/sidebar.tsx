@@ -8,12 +8,16 @@ interface SidebarProps {
 export default function Sidebar({ children }: SidebarProps) {
   const [openMenu, setOpenMenu] = useState(false);
 
+  const handleMenuToggle = () => {
+    setOpenMenu(!openMenu);
+  };
+
   return (
     <>
       <button
         className="p-2 outline-1 outline bg-white outline-slate-400 rounded-xl z-50 left-10 top-10 fixed"
         title="SidebarMenu"
-        onClick={() => setOpenMenu(!openMenu)}
+        onClick={handleMenuToggle}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

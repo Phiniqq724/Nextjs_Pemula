@@ -2,9 +2,12 @@ import { iUser } from "@/lib/types";
 import { BASE_API_URL, BASE_IMAGE_PROFILE } from "@/lib/global";
 import { get } from "@/lib/api-bridge";
 import Image from "next/image";
-import { Search } from "../_components/search";
 import Alert from "@/components/Alert";
 import { cookies } from "next/headers";
+import AddUser from "./_components/addUser";
+import DeleteUser from "./_components/deleteUser";
+import { Search } from "../_components/search";
+import EditUser from "./_components/editUser";
 
 const getUser = async (search: string): Promise<iUser[]> => {
   try {
@@ -31,7 +34,6 @@ const UserPage = async ({
       MANAGER: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
       CASHIER:
         "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
-      USER: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
     };
     return (
       <span
@@ -53,6 +55,7 @@ const UserPage = async ({
       </p>
       <div className="flex justify-center items-center w-full gap-4 mb-4">
         <Search url={`/manager/user`} search={search} />
+        <AddUser />
       </div>
       {users.length === 0 ? (
         <Alert title="Informasi" variants="info">
@@ -63,7 +66,7 @@ const UserPage = async ({
           {users.map((user, index) => (
             <div
               key={index}
-              className="flex flex-wrap border border-gray-200 rounded-md p-2 m-2 shadow-sm"
+              className="flex flex-wrap border justify-between border-gray-200 rounded-md p-2 m-2 shadow-sm"
             >
               <div className="w-full md:w-1/12 p-2">
                 <small className="text-sm font-bold text-primary">ID</small>
@@ -99,12 +102,8 @@ const UserPage = async ({
                 <small className="text-sm font-bold text-primary">Action</small>
                 <br />
                 <div className="flex gap-2">
-                  <button className="px-3 py-1 bg-green-500 text-white text-sm rounded-md">
-                    Edit
-                  </button>
-                  <button className="px-3 py-1 bg-red-500 text-white text-sm rounded-md">
-                    Delete
-                  </button>
+                  <EditUser selectedUser={user} />
+                  <DeleteUser selectedUser={user} />
                 </div>
               </div>
             </div>
